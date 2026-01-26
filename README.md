@@ -21,7 +21,7 @@ Do leave feedback and share any way you find to improve the code
 Email: gamedev.hasnain@gmail.com 
 Twitter: @mediocreGameDev
 
-| Referred YouTube Channels     |  Link |
+| Resources     |  Link |
 |-------------|---------------|
 | Sunny Valley Studio |www.youtube.com/@SunnyValleyStudio|
 | Code Monkey | www.youtube.com/@CodeMonkey|

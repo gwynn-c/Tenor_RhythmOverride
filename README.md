@@ -10,9 +10,10 @@ A rhythm fps shooter inspired by Hellsinger, Hifi Rush, BPM: Bullets per minute 
 ## Current Road Map
 - [ ] Procedural Dungeon Generator (BSP) - Inspired and learning from [Sunny Valley Studio on YouTube](www.youtube.com/@SunnyValleyStudio)
 - [ ] Audio Synchronized and a reactive environment
-- [ ] Conductor class which controls the entire look and feel of the game
+- [x] Conductor class which controls the entire look and feel of the game
 - [ ] A custom class and parser which uses Scriptable Objects to allow players to add in custom songs to play with
 - [ ] Synthwave shader, visualizer background?
+- [ ] Loopable audio (currently only one song length plays with no looping)
 
 ### Contributions
 This is an experimental project and created to learn so feel free to clone, fork or be inspired

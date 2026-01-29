@@ -1,27 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-public class DungeonGenerator
+public class DugeonGenerator
 {
-    private int dungeonWidth, dungeonLength;
-    private List<RoomNode> allSpaceNodes = new List<RoomNode>();
-    public DungeonGenerator(int dungeonWidth, int dungeonLength)
+    
+    List<RoomNode> allNodesCollection = new List<RoomNode>();
+    private int dungeonWidth;
+    private int dungeonLength;
+
+    public DugeonGenerator(int dungeonWidth, int dungeonLength)
     {
         this.dungeonWidth = dungeonWidth;
         this.dungeonLength = dungeonLength;
     }
-    public List<Node> CalculateDungeons(int maxIterations, int roomWidthMin, int roomLengthMin, float roomBtmCornerModifier, float roomTopCornerModifier, int roomOffset, int corridorWidth)
+
+
+
+    public List<Node> CalculateDungeon(int maxIterations, int roomWidthMin, int roomLengthMin, float roomBottomCornerModifier, float roomTopCornerMidifier, int roomOffset, int corridorWidth)
     {
         BinarySpacePartitioner bsp = new BinarySpacePartitioner(dungeonWidth, dungeonLength);
-        allSpaceNodes = bsp.PrepareNodesCollection(maxIterations, roomWidthMin, roomLengthMin);
-        List<Node> roomSpaces = StructureHelper.TraverseGraphToExtractLowestLeaves(bsp.RootNode);
-        RoomGenerator roomGenerator = new RoomGenerator(maxIterations, roomWidthMin, roomLengthMin);
-        List<RoomNode> roomList = roomGenerator.GenerateRoomInGivenSpaces(roomSpaces, roomBtmCornerModifier, roomTopCornerModifier, roomOffset);
+        allNodesCollection = bsp.PrepareNodesCollection(maxIterations, roomWidthMin, roomLengthMin);
+        List<Node> roomSpaces = StructureHelper.TraverseGraphToExtractLowestLeafes(bsp.RootNode);
 
+        RoomGenerator roomGenerator = new RoomGenerator(maxIterations, roomLengthMin, roomWidthMin);
+        List<RoomNode> roomList = roomGenerator.GenerateRoomsInGivenSpaces(roomSpaces, roomBottomCornerModifier, roomTopCornerMidifier, roomOffset);
 
-        CorridorsGenerator corridorsGenerator = new CorridorsGenerator();
-        var corridorList = corridorsGenerator.CreateCorridors(allSpaceNodes, corridorWidth);
+        CorridorsGenerator corridorGenerator = new CorridorsGenerator();
+        var corridorList = corridorGenerator.CreateCorridor(allNodesCollection, corridorWidth);
         
-        
-        return new List<Node>(roomList);
+        return new List<Node>(roomList).Concat(corridorList).ToList();
     }
 }

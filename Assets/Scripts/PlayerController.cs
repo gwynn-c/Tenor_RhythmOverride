@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -32,10 +34,9 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource _gunAudioSource;
     public AudioClip shootSFX, _readyToShootSFX;
-    
-    //Coroutine While magic bullet shoot special bullet
-    //reset input values to default
 
+    public GameObject GroundSlamVFX;
+    [SerializeField] private float slamRadius = 5f;
     void Start()
     {
         _conductor = Conductor.Instance;
@@ -119,4 +120,30 @@ public class PlayerController : MonoBehaviour
     }
 
     
+    public void GroundSlam(float offset)
+    {
+        //The Transform position of where the player's feet landed in relation to the player controller offset
+        var slamPosition = new Vector3(transform.position.x, transform.position.y - offset, transform.position.z);
+        //Colliders of all within the overlap sphere of the ground slam
+        var checkSphereSlammable = Physics.OverlapSphere(slamPosition, slamRadius);
+        //Check if an entity if within direct radius or further from the slam
+        foreach (var slammedEntity in checkSphereSlammable)
+        {
+            if (slammedEntity.TryGetComponent<Interactable_GroundSlam>(out var slammed))
+            {
+                Debug.Log(slammed);
+                var distanceFromPlayer = Vector3.Distance(transform.position, slammed.GetTransform().position);
+                if (distanceFromPlayer >= 1.5f)
+                {
+                    slammed.WithinSlamRadius(distanceFromPlayer);
+                }
+                else
+                {
+                    slammed.DirectSlam();
+                }
+            }
+            
+        }
+        // Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
+    }
 }

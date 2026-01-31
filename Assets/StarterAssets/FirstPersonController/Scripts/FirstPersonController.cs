@@ -77,7 +77,7 @@ namespace StarterAssets
 		private CharacterController _controller;
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
-
+		private PlayerController _playerController;
 		private const float _threshold = 0.01f;
 
 		private bool IsCurrentDeviceMouse
@@ -110,7 +110,7 @@ namespace StarterAssets
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
-
+			_playerController = GetComponent<PlayerController>();
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
@@ -277,15 +277,19 @@ namespace StarterAssets
 		}
 
 		public float slamSpeed;
+
 		private void GroundSlam()
 		{ 
 			_verticalVelocity -= slamSpeed * Time.deltaTime;
+			StartCoroutine(Slam());
 		}
 
-		private void Dash()
+		private IEnumerator Slam()
 		{
-			
+			yield return new WaitUntil(() => Grounded);
+			_playerController.GroundSlam(GroundedOffset);
 		}
+
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 		{
 			if (lfAngle < -360f) lfAngle += 360f;

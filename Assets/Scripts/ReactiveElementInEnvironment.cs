@@ -4,6 +4,7 @@ using MoreMountains.Feedbacks;
 public class ReactiveElementInEnvironment : MonoBehaviour, IReactive
 {
     private MMF_Player player;
+    public float reactToStep;
     public IEnumerator Start()
     {
         player = GetComponent<MMF_Player>();
@@ -13,7 +14,7 @@ public class ReactiveElementInEnvironment : MonoBehaviour, IReactive
     
     public void ReactToTheBeat()
     {
-        player.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = Conductor.Instance.secondsPerBeat / 4f;
+        player.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = Conductor.Instance.secondsPerBeat/reactToStep;
         player.GetFeedbackOfType<MMF_Scale>().SetDelayBetweenRepeats(Conductor.Instance.secondsPerBeat);
         player.InitialDelay = Conductor.Instance.secondsPerBeat;
         player.PlayFeedbacks();

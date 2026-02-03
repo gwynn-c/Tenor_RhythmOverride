@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Conductor
   - Trap
+  - World Space UI
   layers:
   - Default
   - TransparentFX

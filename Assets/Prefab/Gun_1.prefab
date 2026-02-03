@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8861040457192348478
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5014477485315819573}
+  m_Layer: 0
+  m_Name: Barrel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5014477485315819573
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8861040457192348478}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.2654, y: 0, z: 0.0047}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5068337018077674834}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &4745915322752965305
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.615
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 34.211685
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 403.701
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.41322005
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.0030992266
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.9106003
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.0068296134
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      propertyPath: m_Name
+      value: Gun_1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 181142973576852100, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+    - {fileID: 1070610753365270973, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5014477485315819573}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6968138207345347674}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4799783896059102197}
+  m_SourcePrefab: {fileID: 100100000, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+--- !u!4 &5068337018077674834 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+  m_PrefabInstance: {fileID: 4745915322752965305}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5556748177174636520 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 62ed4a924c1bb2844a849ba3fd901e52, type: 3}
+  m_PrefabInstance: {fileID: 4745915322752965305}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6968138207345347674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5556748177174636520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a0cf44ebce14882b4f46533520dbf0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GunController
+  bulletPrefab: {fileID: 7329040411629406293, guid: 660f84302da2c0e45a394c4fa028ad46, type: 3}
+  barrelTransform: {fileID: 5014477485315819573}
+  inputDelay: 0.15
+  shootForce: 120
+  upwardForce: 0
+  timeBetweenShots: 0.7
+  spread: 0.2
+  timeBetweenShooting: 0.7
+  bulletPerShot: 1
+  allowInvoke: 1
+--- !u!114 &4799783896059102197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5556748177174636520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad49c20d398946b4b8bbe6465befa5c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable_Gun

@@ -15,7 +15,6 @@ public class Interactable_GroundSlam : MonoBehaviour, IGroundSlamTargetable
     {
         //Invoke?OpenDoor
         onInteract?.Invoke();
-        Debug.Log("Direct Slam");
     }
     
 

@@ -9,10 +9,10 @@ public class ReactiveElementInEnvironment : MonoBehaviour, IReactive
     {
         player = GetComponent<MMF_Player>();
         yield return new WaitUntil(() => Conductor.Instance != null);
-        ReactToTheBeat();
+        ReactToTheBeat(player);
     }
     
-    public void ReactToTheBeat()
+    public void ReactToTheBeat(MMF_Player player)
     {
         player.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = Conductor.Instance.secondsPerBeat/reactToStep;
         player.GetFeedbackOfType<MMF_Scale>().SetDelayBetweenRepeats(Conductor.Instance.secondsPerBeat);

@@ -18,6 +18,9 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     [SerializeField] private float maxHealth = 100f;
     private float currentHealth;
+
+    public GameObject HealthBarGO;
+    public float offset = 3.5f;
     private void Start()
     {
         
@@ -39,6 +42,7 @@ public class EnemyController : MonoBehaviour, IDamageable
         
         _agent.speed = _speed;
         _agent.stoppingDistance = _attackRange - .2f;
+        
         
         currentHealth = maxHealth;
     }

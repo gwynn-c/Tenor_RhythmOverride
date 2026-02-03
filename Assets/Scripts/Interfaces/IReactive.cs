@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using MoreMountains.Feedbacks;
+using UnityEngine;
 
 public interface IReactive
 {
-    public void ReactToTheBeat();
+    public abstract void ReactToTheBeat(MMF_Player p);
+
     public void ChangeBeatsPerMinute();
 }
 

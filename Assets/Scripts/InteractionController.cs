@@ -1,13 +1,19 @@
 using System.Collections.Generic;
+using StarterAssets;
 using UnityEngine;
 
 public class InteractionController : MonoBehaviour
 {
     [SerializeField] float interactRange = 5f;
+    private StarterAssetsInputs _input;
 
+    private void Start()
+    {
+        _input = GetComponent<StarterAssetsInputs>();
+    }
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.E)) 
+        if(_input.interact) 
         {
             IInteractable interactable = GetInteractableObject();
             if(interactable != null) interactable.Interact(transform);

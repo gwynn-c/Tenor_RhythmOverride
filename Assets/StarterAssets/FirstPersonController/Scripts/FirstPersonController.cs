@@ -62,6 +62,9 @@ namespace StarterAssets
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
 
+		private Vector3 lastGroundedTransform;
+		[SerializeField] private float waitToSetLastGroundedTransform = 5f;
+
 		[SerializeField] private bool canDash = true;
 		[SerializeField]private float dashSpeed;
 		[SerializeField]private float dashTime;
@@ -121,10 +124,13 @@ namespace StarterAssets
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
+			
+
 		}
 
 		private void LateUpdate()
 		{
+			StartCoroutine(nameof(LastGroundedTransform));
 			CameraRotation();
 		}
 
@@ -135,6 +141,20 @@ namespace StarterAssets
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 
+		public IEnumerator LastGroundedTransform()
+		{
+			while (Grounded)
+			{
+				yield return new WaitForSeconds(waitToSetLastGroundedTransform);
+				lastGroundedTransform = transform.position;
+			}
+			yield return null;
+			
+		}
+		public void ResetTransform()
+		{
+			transform.position = lastGroundedTransform;	
+		}
 		private void CameraRotation()
 		{
 			// if there is an input

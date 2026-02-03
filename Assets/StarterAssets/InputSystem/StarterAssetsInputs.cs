@@ -15,6 +15,7 @@ namespace StarterAssets
 		public bool attack;
 		public bool dash;
 		public bool crouch;
+		public bool interact;
 		[Header("Movement Settings")]
 		public bool analogMovement;
 
@@ -59,6 +60,16 @@ namespace StarterAssets
 		public void OnDash(InputValue value)
 		{
 			DashInput(value.isPressed);
+		}
+
+		public void OnInteract(InputValue value)
+		{
+			InteractValue(value.isPressed);
+		}
+
+		private void InteractValue(bool newInteract)
+		{
+			interact = newInteract;		
 		}
 #endif
 

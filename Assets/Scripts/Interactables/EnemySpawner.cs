@@ -28,12 +28,12 @@ public class EnemySpawner : MonoBehaviour
         StartCoroutine(SpawnWave());
     }
 
-
+ 
     private IEnumerator SpawnWave()
     {
         if (currentWave == 0)
         {
-            while (spawnedEnemies.Count <= numberOfEnemiesToSpawn)
+            while (spawnedEnemies.Count < numberOfEnemiesToSpawn)
                 
             {
                 yield return new WaitForSeconds(timeBetweenEnemies);
@@ -45,7 +45,7 @@ public class EnemySpawner : MonoBehaviour
         }
         yield return new WaitUntil(() => WaveCleared);
         
-        InvokeRepeating(nameof(SpawnEnemies), timeBetweenSpawns, timeBetweenEnemies);
+        Invoke(nameof(SpawnEnemies), timeBetweenSpawns);
     }
 
     private void SpawnEnemies()

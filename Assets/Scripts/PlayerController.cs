@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using MoreMountains.Feedbacks;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -9,20 +10,20 @@ public class PlayerController : MonoBehaviour
 {
     //Components
     Conductor _conductor;
-
+    private MMF_Player _player;
     private StarterAssetsInputs _input;
     //Gun References
     [SerializeField] private GameObject equippedGun;
     public bool isGunEquipped;
     public Transform GunSlot;
-        
-
+    
     public GameObject GroundSlamVFX;
     [SerializeField] private float slamRadius = 5f;
     void Start()
     {
         _conductor = Conductor.Instance;
         _input = GetComponent<StarterAssetsInputs>();
+        _player = GetComponent<MMF_Player>();
     }
 
     private void Update()
@@ -47,6 +48,11 @@ public class PlayerController : MonoBehaviour
             }
             
         }
+
+        var cameraShake = _player.GetFeedbackOfType<MMF_CameraShake>();
+        cameraShake.CameraShakeProperties.Amplitude = 5;
+        cameraShake.CameraShakeProperties.Frequency = 100;
+        _player.PlayFeedbacks();
         // Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
     }
 

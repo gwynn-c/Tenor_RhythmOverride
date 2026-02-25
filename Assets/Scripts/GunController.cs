@@ -13,7 +13,7 @@ public class GunController : MonoBehaviour
 
     private float beatInput;
     [Range(0.1f, .3f)] [SerializeField] private float inputDelay = .15f;
-    public bool isOnBeat { get; private set; }
+    public bool IsOnBeat { get; private set; }
 
     [SerializeField] private float shootForce, upwardForce;
 
@@ -61,11 +61,11 @@ public class GunController : MonoBehaviour
             isShooting = _input.attack;
             if ( beatInput <= _conductor.secondsPerBeat && beatInput > _conductor.secondsPerBeat - inputDelay)
             {
-                isOnBeat = true;
+                IsOnBeat = true;
             }
             else
             {
-                isOnBeat = false;
+                IsOnBeat = false;
             }
             
             if (isShooting && isReadyToShoot)
@@ -79,6 +79,7 @@ public class GunController : MonoBehaviour
     private void Shoot()
     {
         isReadyToShoot = false;
+        if(IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
         
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
@@ -98,7 +99,7 @@ public class GunController : MonoBehaviour
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(_mainCamera.transform.up * upwardForce, ForceMode.Impulse);
 
-
+        
         if (allowInvoke)
         {
             Invoke("ResetShot", timeBetweenShots);

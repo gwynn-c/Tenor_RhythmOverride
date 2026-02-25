@@ -50,7 +50,7 @@ public class EnemyController : MonoBehaviour, IDamageable
 
     private void ChasePlayer()
     {
-        if (_player == null || _isAttacking) return;
+        if (_player == null || _isAttacking ) return;
         _agent.isStopped = false;
 
         var DistanceToPlayer= Vector3.Distance(_player.position, transform.position);
@@ -77,16 +77,23 @@ public class EnemyController : MonoBehaviour, IDamageable
     {
         currentHealth -= Damage;
         _agent.isStopped = true;
+        _agent.velocity = Vector3.zero;
         if (currentHealth <= 0)
         {
-            _animator.SetBool("Dead", true);
+            Death();
             
         }
+        
         _animator.SetTrigger("TakeDamage");
     }
 
-    public void Destroy()
+    public void Death()
     {
-        throw new System.NotImplementedException();
+        _animator.CrossFade("Death", .1f);
+        _agent.isStopped = true;
+        GetComponentInChildren<Rigidbody>().linearVelocity = Vector3.zero;
+        GetComponentInChildren<Rigidbody>().angularVelocity = Vector3.zero;
+
+        this.enabled = false;
     }
 }

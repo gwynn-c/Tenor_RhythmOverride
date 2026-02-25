@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 public class Conductor : MonoBehaviour
@@ -24,7 +25,7 @@ public class Conductor : MonoBehaviour
     [Header("Streak Settings")]
     [Space(10)]
     public int currentStreak;
-    
+    public TextMeshProUGUI streakText;
     private void OnEnable()
     {
         EventManager.instance.playerEvents.OnBeatInput += IncrementScore;
@@ -60,6 +61,8 @@ public class Conductor : MonoBehaviour
         songPosition = (float)(AudioSettings.dspTime - dspSongTime);
         
         songPositionInBeats = songPosition / secondsPerBeat;
+        
+        streakText.text = "Streak: " + currentStreak.ToString();
     }
     
     public float GetSongPosition()

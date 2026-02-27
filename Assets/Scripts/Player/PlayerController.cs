@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using MoreMountains.Feedbacks;
+using MoreMountains.FeedbacksForThirdParty;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -16,9 +17,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject equippedGun;
     public bool isGunEquipped;
     public Transform GunSlot;
-    
     public GameObject GroundSlamVFX;
     [SerializeField] private float slamRadius = 5f;
+
+    public AudioClip[] footstepClips;
+
+    public AudioClip[] runFootStepClips;
     void Start()
     {
         _conductor = Conductor.Instance;
@@ -29,6 +33,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         isGunEquipped = equippedGun != null;
+        if(_input.dash) _player.GetFeedbackOfType<MMF_LensDistortion_URP>().Play(Vector3.zero, 1f);
     }
 
     // Update is called once per frame
@@ -53,7 +58,8 @@ public class PlayerController : MonoBehaviour
         cameraShake.CameraShakeProperties.Amplitude = 5;
         cameraShake.CameraShakeProperties.Frequency = 100;
         _player.PlayFeedbacks();
-        // Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
+        // SoundFXManager.instance.PlaySingleSoundFXClip();
+        Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
     }
 
 
@@ -70,5 +76,26 @@ public class PlayerController : MonoBehaviour
         equippedGun.transform.position = GunSlot.position;
         equippedGun.transform.localScale = Vector3.one;
     }
+
+    public AudioSource playerAudioSource;
+    public void PlayWalkAudio()
+    {
+        if (playerAudioSource.isPlaying) return;
+        playerAudioSource.clip = footstepClips[UnityEngine.Random.Range(0, footstepClips.Length - 1)];
+        playerAudioSource.Play();
+    }
+
+    public void PlayRunAudio()
+    {
+        if (playerAudioSource.isPlaying) return;
+        playerAudioSource.clip = runFootStepClips[UnityEngine.Random.Range(0, runFootStepClips.Length - 1)];
+        playerAudioSource.Play();
+    }
     
+    public void PlayJumpAudio(AudioClip[] jumpClips, Vector3 position, float volume)
+    {
+        if (playerAudioSource.isPlaying) return;
+        playerAudioSource.clip = jumpClips[UnityEngine.Random.Range(0, jumpClips.Length - 1)];
+        playerAudioSource.Play();
+    }
 }

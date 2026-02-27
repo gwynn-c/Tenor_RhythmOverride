@@ -1,4 +1,5 @@
 using System.Collections;
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,7 +14,9 @@ public class Conductor : MonoBehaviour
     public float songPositionInBeats;
     public float dspSongTime;
     public float songPosition;
-    
+
+    public float inputTime;
+    public float InputStep = 1;
     [Header("Loop Settings")]
     [Space(10)]
     //If Looping Audio
@@ -40,6 +43,7 @@ public class Conductor : MonoBehaviour
     {
         if(Instance == null)
             Instance = this;
+        
     }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -47,8 +51,13 @@ public class Conductor : MonoBehaviour
     {
         secondsPerBeat = 60f/beatsPerMinute;
         dspSongTime = (float)AudioSettings.dspTime;
-        
+        inputTime = secondsPerBeat / InputStep;
         audioSource.Play();
+        var crosshair = GetComponent<MMF_Player>();
+            crosshair.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = inputTime;
+            crosshair.GetFeedbackOfType<MMF_ImageAlpha>().Duration = inputTime;
+
+        
     }
 
     void IncrementScore()

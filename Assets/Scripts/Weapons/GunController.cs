@@ -25,9 +25,9 @@ public class GunController : MonoBehaviour
     public bool allowInvoke;
 
 
-
-    // public AudioSource _gunAudioSource;
-    // public AudioClip shootSFX, _readyToShootSFX;
+    public GameObject MuzzleFlashVFX;
+    
+    // public AudioClip shootSFX;
 
     private IEnumerator Start()
     {
@@ -80,7 +80,7 @@ public class GunController : MonoBehaviour
     {
         isReadyToShoot = false;
         if(IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
-        
+        Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
         

@@ -21,7 +21,7 @@ namespace StarterAssets
 		public float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
-
+		
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
@@ -45,6 +45,7 @@ namespace StarterAssets
 		[Tooltip("What layers the character uses as ground")]
 		public LayerMask GroundLayers;
 
+		public AudioClip[] landingSFXClip;
 		[Header("Cinemachine")]
 		[Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
 		public GameObject CinemachineCameraTarget;
@@ -125,7 +126,7 @@ namespace StarterAssets
 			GroundedCheck();
 			Move();
 			
-
+			
 		}
 
 		private void LateUpdate()
@@ -182,7 +183,6 @@ namespace StarterAssets
 			
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
 			// note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
@@ -198,10 +198,11 @@ namespace StarterAssets
 			// accelerate or decelerate to target speed
 			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
 			{
+
 				// creates curved result rather than a linear one giving a more organic speed change
 				// note T in Lerp is clamped, so we don't need to clamp our speed
 				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-
+				
 				// round speed to 3 decimal places
 				_speed = Mathf.Round(_speed * 1000f) / 1000f;
 			}
@@ -218,6 +219,12 @@ namespace StarterAssets
 			if (_input.move != Vector2.zero)
 			{
 				// move
+				if (Grounded)
+				{
+					if(_input.sprint ) 
+						_playerController.PlayRunAudio();
+					_playerController.PlayWalkAudio();
+				}
 				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
 			}
 
@@ -242,18 +249,21 @@ namespace StarterAssets
 			if (Grounded)
 			{
 				_input.crouch = false;
-
 				// reset the fall timeout timer
 				_fallTimeoutDelta = FallTimeout;
 				// stop our velocity dropping infinitely when grounded
 				if (_verticalVelocity < 0.0f)
 				{
+
 					_verticalVelocity = -2f;
 				}
 				// Jump
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					canDoubleJump = true;
+					_playerController.PlayJumpAudio(jumpSFXClip, transform.position, 1f);
+
+
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
 					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 				}
@@ -267,6 +277,8 @@ namespace StarterAssets
 			{
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
+					_playerController.PlayJumpAudio(jumpSFXClip, transform.position, 1f);
+
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
 					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity) * 2;
 					canDoubleJump = false;
@@ -279,6 +291,7 @@ namespace StarterAssets
 				// fall timeout
 				if (_fallTimeoutDelta >= 0.0f)
 				{
+
 					_fallTimeoutDelta -= Time.deltaTime;
 				}
 
@@ -297,6 +310,7 @@ namespace StarterAssets
 		}
 
 		public float slamSpeed;
+		public AudioClip[] jumpSFXClip;
 
 		private void GroundSlam()
 		{ 
@@ -316,7 +330,8 @@ namespace StarterAssets
 			if (lfAngle > 360f) lfAngle -= 360f;
 			return Mathf.Clamp(lfAngle, lfMin, lfMax);
 		}
-
+		
+		
 		private void OnDrawGizmosSelected()
 		{
 			Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);

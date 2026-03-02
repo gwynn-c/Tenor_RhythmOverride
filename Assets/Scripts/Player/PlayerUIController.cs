@@ -5,6 +5,7 @@ public class PlayerUIController : MonoBehaviour
 {
     [SerializeField] private InteractionController interactionController;
     [SerializeField] private GameObject containerGameObject;
+    [SerializeField] private GameObject weaponInfoGameObject;
 
     [SerializeField] TextMeshProUGUI interactTextMeshProUGUI;
 
@@ -29,5 +30,19 @@ public class PlayerUIController : MonoBehaviour
     }   
     private void Hide(){
         containerGameObject.SetActive(false);
+    }
+
+    public void ShowWeaponInfoPanel(WeaponSO weaponInfo)
+    {
+        Cursor.lockState = CursorLockMode.Confined;
+        weaponInfoGameObject.GetComponent<UIHandler>().InitializePanel(weaponInfo);
+        weaponInfoGameObject.SetActive(true);
+    }
+
+    public void HideWeaponInfoPanel()
+    {
+        weaponInfoGameObject.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 }

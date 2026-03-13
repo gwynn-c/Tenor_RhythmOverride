@@ -63,18 +63,20 @@ namespace StarterAssets
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
 
-		private Vector3 lastGroundedTransform;
-		[SerializeField] private float waitToSetLastGroundedTransform = 5f;
+		[Header("Ground Slam")]
+		[SerializeField] private bool canGroundSlam = true;
+		[SerializeField] private float groundSlamCooldown = 4f;
 
+		[Header("Dash")]
 		[SerializeField] private bool canDash = true;
-		[SerializeField]private float dashSpeed;
-		[SerializeField]private float dashTime;
-		[SerializeField] private float dashDelay;
+		[SerializeField] private float dashSpeed;
+		[SerializeField] private float dashTime;
+		[SerializeField] private float dashCooldown = 1.8f;
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
-	
+		
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -82,6 +84,7 @@ namespace StarterAssets
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
 		private PlayerController _playerController;
+		private PlayerUIController uiController;
 		private const float _threshold = 0.01f;
 
 		private bool IsCurrentDeviceMouse
@@ -115,9 +118,11 @@ namespace StarterAssets
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
 			_playerController = GetComponent<PlayerController>();
+			uiController = GetComponent<PlayerUIController>();
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+			canGroundSlam = true;
 		}
 
 		private void Update()
@@ -131,7 +136,6 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
-			StartCoroutine(nameof(LastGroundedTransform));
 			CameraRotation();
 		}
 
@@ -142,20 +146,8 @@ namespace StarterAssets
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 
-		public IEnumerator LastGroundedTransform()
-		{
-			while (Grounded)
-			{
-				yield return new WaitForSeconds(waitToSetLastGroundedTransform);
-				lastGroundedTransform = transform.position;
-			}
-			yield return null;
-			
-		}
-		public void ResetTransform()
-		{
-			transform.position = lastGroundedTransform;	
-		}
+		
+		
 		private void CameraRotation()
 		{
 			// if there is an input
@@ -233,16 +225,26 @@ namespace StarterAssets
 				canDash = false;
 				_controller.Move(inputDirection.normalized * (dashSpeed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 				_input.dash = false;
+				uiController.DashCooldownFill.fillAmount = 0;
+
 				StartCoroutine(ResetDash());
 			}
 			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
-
+		
 		private IEnumerator ResetDash()
 		{
-			 yield return new WaitForSeconds(dashDelay);
-			 canDash = true;
+			var tempCD = 0f;
+			while (tempCD <= dashCooldown)
+			{
+				tempCD += Time.deltaTime;
+				uiController.DashCooldownFill.fillAmount = tempCD/dashCooldown;
+				yield return null;
+			}
+			canDash = true;
+			yield return new WaitUntil(() => canDash);
+			
 		}
 		private void JumpAndGravity()
 		{
@@ -298,9 +300,11 @@ namespace StarterAssets
 				// if we are not grounded, do not jump
 					_input.jump = false;
 			}
-			if (_input.crouch && !Grounded)
+			if (_input.crouch && !Grounded && canGroundSlam)
 			{
 				GroundSlam();
+				canGroundSlam = false;
+				StartCoroutine(nameof(GroundSlamUI));
 			}
 			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
 			if (_verticalVelocity < _terminalVelocity)
@@ -315,6 +319,8 @@ namespace StarterAssets
 		private void GroundSlam()
 		{ 
 			_verticalVelocity -= slamSpeed * Time.deltaTime;
+			uiController.SlamCooldownFill.fillAmount = 0;
+
 			StartCoroutine(Slam());
 		}
 
@@ -323,7 +329,20 @@ namespace StarterAssets
 			yield return new WaitUntil(() => Grounded);
 			_playerController.GroundSlam(GroundedOffset);
 		}
+		
 
+		IEnumerator GroundSlamUI()
+		{
+			var tempCD = 0f;
+			while (tempCD <= groundSlamCooldown)
+			{
+				tempCD += Time.fixedDeltaTime;
+				uiController.SlamCooldownFill.fillAmount = tempCD / groundSlamCooldown;
+				yield return null;
+			}
+			canGroundSlam = true;
+			yield return new WaitUntil(() => canGroundSlam);
+		}
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 		{
 			if (lfAngle < -360f) lfAngle += 360f;

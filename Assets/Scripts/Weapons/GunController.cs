@@ -9,6 +9,8 @@ public class GunController : MonoBehaviour
     private StarterAssetsInputs _input;
 
     [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private GameObject secondaryPrefab;
+    
     [SerializeField] private Transform barrelTransform;
 
     private float beatInput;
@@ -16,6 +18,7 @@ public class GunController : MonoBehaviour
     public bool IsOnBeat { get; private set; }
 
     [SerializeField] private float shootForce, upwardForce;
+    [SerializeField] private float secondaryForce;
 
     [SerializeField] private float timeBetweenShots, spread, timeBetweenShooting;
 
@@ -26,12 +29,21 @@ public class GunController : MonoBehaviour
 
 
     public GameObject MuzzleFlashVFX;
-    
-    // public AudioClip shootSFX;
 
+    // public AudioClip shootSFX;
+    private void Awake()
+    {
+        if (transform.parent != null)
+        {
+            _input = GetComponentInParent<StarterAssetsInputs>();
+
+        }
+    }
     private IEnumerator Start()
     {
         _conductor = Conductor.Instance;
+        Initialize(_input);
+
         yield return new WaitUntil(() => _input != null);
     }
     
@@ -39,10 +51,7 @@ public class GunController : MonoBehaviour
     private void Update()
     {
         if (_input == null) return;
-        if (beatInput > _conductor.secondsPerBeat)
-        {
-            beatInput = 0;
-        }
+        
         beatInput += Time.deltaTime;
         InputHandler();
     }
@@ -59,28 +68,42 @@ public class GunController : MonoBehaviour
         if (_input.attack)
         {
             isShooting = _input.attack;
-            if ( beatInput <= _conductor.secondsPerBeat && beatInput > _conductor.secondsPerBeat - inputDelay)
-            {
-                IsOnBeat = true;
-            }
-            else
-            {
-                IsOnBeat = false;
-            }
             
             if (isShooting && isReadyToShoot)
             {
+                if (beatInput >= _conductor.secondsPerBeat - inputDelay  && beatInput <= _conductor.secondsPerBeat + inputDelay)
+                {
+ 
+                    IsOnBeat = true;
+                }
+                else
+                {
+                    IsOnBeat = false;
+                }
+
                 Shoot();
+            }
+        }
+
+        if (_input.secondaryAttack  && _conductor.currentStreak >= 3)
+        {
+            isShooting = _input.secondaryAttack;
+            if (isShooting && isReadyToShoot)
+            {            
+                _conductor.currentStreak -= 3;
+                ShootSecondary();
             }
         }
     }
 
-
+    
     private void Shoot()
     {
         isReadyToShoot = false;
         if(IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
-        Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
+        else EventManager.instance.playerEvents.OnBeatInputMissed();
+        if(MuzzleFlashVFX != null)
+            Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
         
@@ -97,6 +120,36 @@ public class GunController : MonoBehaviour
         spawnedPrefab.transform.forward = directionWithSpread.normalized;
         
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+
+        
+        if (allowInvoke)
+        {
+            Invoke("ResetShot", timeBetweenShots);
+            allowInvoke = false;
+        }
+        
+    }
+    private void ShootSecondary()
+    {
+        isReadyToShoot = false;
+        if(MuzzleFlashVFX != null)
+            Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
+        Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+        
+        var targetPosition = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
+
+        var x = Random.Range(-spread, spread);
+        var y = Random.Range(-spread, spread);
+        
+        var directionWithoutSpread = targetPosition - barrelTransform.position;
+        
+        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
+        
+        var spawnedPrefab = Instantiate(secondaryPrefab, barrelTransform.position, Quaternion.identity);
+        spawnedPrefab.transform.forward = directionWithSpread.normalized;
+        
+        spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * secondaryForce, ForceMode.Impulse);
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(_mainCamera.transform.up * upwardForce, ForceMode.Impulse);
 
         
@@ -107,12 +160,13 @@ public class GunController : MonoBehaviour
         }
         
     }
-
+    
     private void ResetShot()
     {
         isReadyToShoot = true;
         allowInvoke = true;
         _input.attack = false;
+        _input.secondaryAttack= false;
         beatInput = 0;
     }
 

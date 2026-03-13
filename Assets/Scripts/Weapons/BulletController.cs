@@ -23,15 +23,7 @@ public class BulletController : MonoBehaviour
     [SerializeField] private GameObject hitImpact;
     private PhysicsMaterial _bounceMaterial;
 
-    private void OnEnable()
-    {
-        EventManager.instance.playerEvents.OnBeatInput += GetFaster;
-    }
-
-    private void OnDisable()
-    {
-        EventManager.instance.playerEvents.OnBeatInput -= GetFaster;
-    }
+  
     private void Start()
     {
         Setup();
@@ -48,7 +40,7 @@ public class BulletController : MonoBehaviour
                 bounceCombine = PhysicsMaterialCombine.Maximum,
                 frictionCombine = PhysicsMaterialCombine.Minimum
             };
-            GetComponent<CapsuleCollider>().material = _bounceMaterial;
+            GetComponent<SphereCollider>().material = _bounceMaterial;
         }
         rb.useGravity = useGravity;
     }
@@ -67,10 +59,15 @@ public class BulletController : MonoBehaviour
             if(maxLifeTime <= 0) BulletImpact();
         }
     }
+
+    private GameObject spawnedGO;
     private void Explode()
     {
-        
-        if(explosionGameObject != null) Instantiate(explosionGameObject, transform.position, Quaternion.identity);
+
+        if (explosionGameObject != null && spawnedGO == null)
+        {
+             spawnedGO = Instantiate(explosionGameObject, transform.position, Quaternion.identity);
+        }
         Collider[] enemies = Physics.OverlapSphere(transform.position, explosionRadius, enemiesLayerMask);
         foreach (var e in enemies)
         {
@@ -97,22 +94,18 @@ public class BulletController : MonoBehaviour
             if (other.collider.CompareTag("Enemy"))
             {
                 if(hitImpact != null) Instantiate(hitImpact, other.contacts[0].point, Quaternion.identity);
-                other.collider.GetComponent<EnemyController>().TakeDamage(damage);
-                Destroy(gameObject, .05f);
+                if(other.collider.TryGetComponent<EnemyController>(out EnemyController e) )
+                   e.TakeDamage(damage);
             }
+            Destroy(gameObject);
         }
         else
         {
             currentBounces++;
-            Instantiate(explosionGameObject, transform.position, Quaternion.identity);
+            // Instantiate(explosionGameObject, transform.position, Quaternion.identity);
             if(other.collider.CompareTag("Enemy") && explodeOnCollision) Explode();
         }
        
     }
 
-
-    private void GetFaster()
-    {
-        print("Getting faster!");
-    }
 }

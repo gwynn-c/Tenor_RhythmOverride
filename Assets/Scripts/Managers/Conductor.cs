@@ -17,13 +17,13 @@ public class Conductor : MonoBehaviour
 
     public float inputTime;
     public float InputStep = 1;
-    [Header("Loop Settings")]
-    [Space(10)]
-    //If Looping Audio
-    public float firstBeatOffset;
-    public float beatsPerLoop;
-    public int completedLoops;
-    public float loopPositionInBeats;
+    // [Header("Loop Settings")]
+    // [Space(10)]
+    // //If Looping Audio
+    // public float firstBeatOffset;
+    // public float beatsPerLoop;
+    // public int completedLoops;
+    // public float loopPositionInBeats;
 
     [Header("Streak Settings")]
     [Space(10)]
@@ -32,11 +32,14 @@ public class Conductor : MonoBehaviour
     private void OnEnable()
     {
         EventManager.instance.playerEvents.OnBeatInput += IncrementScore;
+        EventManager.instance.playerEvents.OnBeatMissed += ResetStreak;
     }
 
     private void OnDisable()
     {
         EventManager.instance.playerEvents.OnBeatInput -= IncrementScore;
+        EventManager.instance.playerEvents.OnBeatMissed -= ResetStreak;
+        
     }
     
     public void Awake()
@@ -51,13 +54,17 @@ public class Conductor : MonoBehaviour
     {
         secondsPerBeat = 60f/beatsPerMinute;
         dspSongTime = (float)AudioSettings.dspTime;
-        inputTime = secondsPerBeat / InputStep;
         audioSource.Play();
-        var crosshair = GetComponent<MMF_Player>();
-            crosshair.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = inputTime;
-            crosshair.GetFeedbackOfType<MMF_ImageAlpha>().Duration = inputTime;
-
         
+        
+        var crosshair = GetComponent<MMF_Player>();
+        crosshair.GetFeedbackOfType<MMF_Scale>().AnimateScaleDuration = secondsPerBeat;
+        crosshair.GetFeedbackOfType<MMF_Scale>().Timing.CooldownDuration = secondsPerBeat;
+        crosshair.GetFeedbackOfType<MMF_Scale>().SetDelayBetweenRepeats(secondsPerBeat);
+
+        crosshair.GetFeedbackOfType<MMF_ImageAlpha>().Duration = secondsPerBeat;
+        crosshair.GetFeedbackOfType<MMF_ImageAlpha>().SetDelayBetweenRepeats(secondsPerBeat);
+
     }
 
     void IncrementScore()
@@ -65,15 +72,18 @@ public class Conductor : MonoBehaviour
         currentStreak++;
     }
 
+    void ResetStreak()
+    {
+        currentStreak = 0;
+    }
     void Update()
     {
         songPosition = (float)(AudioSettings.dspTime - dspSongTime);
         
         songPositionInBeats = songPosition / secondsPerBeat;
-        
         streakText.text = "Streak: " + currentStreak.ToString();
     }
-    
+
     public float GetSongPosition()
     {
         return songPosition;
@@ -83,4 +93,6 @@ public class Conductor : MonoBehaviour
     {
         return audioSource.clip.length;
     }
+    
+    
 }

@@ -33,11 +33,10 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         isGunEquipped = equippedGun != null;
-        if(_input.dash) _player.GetFeedbackOfType<MMF_LensDistortion_URP>().Play(Vector3.zero, 1f);
     }
 
     // Update is called once per frame
-    
+    [SerializeReference] private GameObject spawnedGO;
     public void GroundSlam(float offset)
     {
         //The Transform position of where the player's feet landed in relation to the player controller offset
@@ -59,7 +58,10 @@ public class PlayerController : MonoBehaviour
         cameraShake.CameraShakeProperties.Frequency = 100;
         _player.PlayFeedbacks();
         // SoundFXManager.instance.PlaySingleSoundFXClip();
-        Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
+        if(spawnedGO == null)
+        {
+            spawnedGO = Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
+        }
     }
 
 

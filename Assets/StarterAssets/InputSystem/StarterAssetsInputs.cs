@@ -16,6 +16,9 @@ namespace StarterAssets
 		public bool dash;
 		public bool crouch;
 		public bool interact;
+		public bool secondaryAttack;
+		public bool specialAttack;
+
 		[Header("Movement Settings")]
 		public bool analogMovement;
 
@@ -71,6 +74,16 @@ namespace StarterAssets
 		{
 			interact = newInteract;		
 		}
+
+		public void OnSecondaryAttack(InputValue value)
+		{
+			SecondaryAttack(value.isPressed);
+		}
+
+		public void OnSpecialAttack(InputValue value)
+		{
+			SpecialAttack(value.isPressed);
+		}
 #endif
 
 		public void AttackInput(bool newAttackInput)
@@ -96,6 +109,15 @@ namespace StarterAssets
 			look = newLookDirection;
 		}
 
+		public void SecondaryAttack(bool newSecondaryAttack)
+		{
+			secondaryAttack = newSecondaryAttack;
+		}
+
+		public void SpecialAttack(bool newSpecialAttack)
+		{
+			specialAttack = newSpecialAttack;
+		}
 		public void JumpInput(bool newJumpState)
 		{
 			jump = newJumpState;

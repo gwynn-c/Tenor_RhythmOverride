@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour
 {
@@ -7,12 +8,28 @@ public class PlayerUIController : MonoBehaviour
     [SerializeField] private GameObject containerGameObject;
     [SerializeField] private GameObject weaponInfoGameObject;
 
-    [SerializeField] TextMeshProUGUI interactTextMeshProUGUI;
+    [SerializeField] private TextMeshProUGUI interactTextMeshProUGUI;
+
+    [SerializeField] private GameObject inputFeedbackContainer;
+
+    public Image DashCooldownFill;
+    public Image ThrowableCooldownFill;
+    public  Image SlamCooldownFill;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void OnEnable()
     {
-        
+        EventManager.instance.playerEvents.OnBeatInput += PlayFeedback;
+
+    }
+    void OnDisable()
+    {
+        EventManager.instance.playerEvents.OnBeatInput -= PlayFeedback;
+
+    }
+    private void PlayFeedback()
+    {
+        inputFeedbackContainer.SetActive(true);
     }
 
     // Update is called once per frame
@@ -43,6 +60,6 @@ public class PlayerUIController : MonoBehaviour
     {
         weaponInfoGameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-
     }
+    
 }

@@ -14,7 +14,12 @@ A rhythm fps shooter inspired by Hellsinger, Hifi Rush, BPM: Bullets per minute 
 - [ ] A custom class and parser which uses Scriptable Objects to allow players to add in custom songs to play with
 - [ ] Synthwave shader, visualizer background?
 - [ ] Loopable audio (currently only one song length plays with no looping)
+- [ ] Create a playground and set it up for playtesting
 
+## Refactoring Goals
+- [ ] Implement a factory/design template for Weapons
+ - [ ] Allow additional weapon types
+  
 ### Contributions
 This is an experimental project and created to learn so feel free to clone, fork or be inspired
 Do leave feedback and share any way you find to improve the code

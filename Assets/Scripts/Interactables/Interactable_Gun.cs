@@ -32,8 +32,8 @@ public class Interactable_Gun : MonoBehaviour, IInteractable
 
     public void SelectWeapon()
     {
-        interactorTransform.GetComponent<PlayerController>().SetEquippedGun(gameObject);
         interactorTransform.GetComponent<PlayerUIController>().HideWeaponInfoPanel();
+        interactorTransform.GetComponent<PlayerController>().SetEquippedGun(gameObject);
         Destroy(gameObject.GetComponent<SphereCollider>());
         OnInteract?.Invoke();
         InteractableVFX.SetActive(false);

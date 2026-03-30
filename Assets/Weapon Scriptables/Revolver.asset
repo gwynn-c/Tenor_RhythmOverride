@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Revolver
   m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
   _name: Revolver
-  _description: Packs a punch
-  _icon: {fileID: 1705615154, guid: 6582f34ddd5f686408c019550cd94c9d, type: 3}
+  _description: Packs a Punch, if your on a roll. Press Right click to see the magic
+  _icon: {fileID: 21300000, guid: 3e35d781a63a4d54582be37793f381d0, type: 3}
   bulletPrefab: {fileID: 7329040411629406293, guid: 660f84302da2c0e45a394c4fa028ad46, type: 3}
   muzzleVFXPrefab: {fileID: 6980259576133684760, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
   shootForce: 200

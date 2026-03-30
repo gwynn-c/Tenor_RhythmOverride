@@ -17,6 +17,7 @@ public class InteractionController : MonoBehaviour
         {
             IInteractable interactable = GetInteractableObject();
             if(interactable != null) interactable.Interact(transform);
+            _input.interact = false;
         }
     }
 

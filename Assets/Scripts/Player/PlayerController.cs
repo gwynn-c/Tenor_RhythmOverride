@@ -5,6 +5,7 @@ using MoreMountains.Feedbacks;
 using MoreMountains.FeedbacksForThirdParty;
 using StarterAssets;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 public class PlayerController : MonoBehaviour
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
     public AudioClip[] runFootStepClips;
     void Start()
     {
+        if(Cursor.lockState == CursorLockMode.None) Cursor.lockState = CursorLockMode.Locked;
+        Interacting = false;
         _conductor = Conductor.Instance;
         _input = GetComponent<StarterAssetsInputs>();
         _player = GetComponent<MMF_Player>();
@@ -32,8 +35,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        GetComponent<PlayerInput>().enabled = !Interacting;
         isGunEquipped = equippedGun != null;
     }
+
+    public bool Interacting;
 
     // Update is called once per frame
     [SerializeReference] private GameObject spawnedGO;
@@ -48,7 +54,12 @@ public class PlayerController : MonoBehaviour
         {
             if (slammedEntity.TryGetComponent<Interactable_GroundSlam>(out var slammed))
             {
-                    slammed.DirectSlam();
+                if (_conductor.currentStreak >= 10)
+                {
+                    _conductor.currentStreak -= 10;
+                    slammed.Stun();
+                }
+                slammed.DirectSlam();
             }
             
         }
@@ -80,6 +91,8 @@ public class PlayerController : MonoBehaviour
     }
 
     public AudioSource playerAudioSource;
+    [SerializeField] private float stunDuration;
+
     public void PlayWalkAudio()
     {
         if (playerAudioSource.isPlaying) return;

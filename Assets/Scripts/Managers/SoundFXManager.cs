@@ -11,6 +11,7 @@ public class SoundFXManager : MonoBehaviour
         if(instance != null) 
         {
             Debug.Log("Another instance of SoundFXManager already exists in the scene");
+            Destroy(gameObject);
         }
         instance = this;
     }
@@ -25,7 +26,7 @@ public class SoundFXManager : MonoBehaviour
     }
     public void PlaySingleSoundFXClip(AudioClip audioClip, Transform spawnTransform, float volume)
     {
-        AudioSource source = Instantiate(SoundFXSource, spawnTransform.position, Quaternion.identity);
+        var source = Instantiate(SoundFXSource, spawnTransform.position, Quaternion.identity);
         source.PlayOneShot(audioClip, volume);
         float clipRunTime = audioClip.length;
         Destroy(source.gameObject, clipRunTime);

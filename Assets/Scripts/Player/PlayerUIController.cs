@@ -43,7 +43,7 @@ public class PlayerUIController : MonoBehaviour
     
     private void Show(IInteractable interactable){
         containerGameObject.SetActive(true);
-        interactTextMeshProUGUI.text = "E to pick up " + interactable.GetInteractableName();
+        interactTextMeshProUGUI.text = interactable.GetInteractableName();
     }   
     private void Hide(){
         containerGameObject.SetActive(false);

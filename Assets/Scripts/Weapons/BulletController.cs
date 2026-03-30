@@ -47,7 +47,7 @@ public class BulletController : MonoBehaviour
 
     private void Update()
     {
-        maxLifeTime -= Time.deltaTime;  
+        maxLifeTime -= Time.fixedDeltaTime;  
         if (!isBullet)
         {
             if(currentBounces > maxBounces) Explode();
@@ -103,9 +103,13 @@ public class BulletController : MonoBehaviour
         {
             currentBounces++;
             // Instantiate(explosionGameObject, transform.position, Quaternion.identity);
-            if(other.collider.CompareTag("Enemy") && explodeOnCollision) Explode();
+            if(other.collider.CompareTag("Enemy") && explodeOnCollision)
+            {
+                if(other.collider.TryGetComponent<EnemyController>(out EnemyController e) )
+                    e.TakeDamage(damage);
+            }
+            Explode();  
         }
-       
     }
 
 }

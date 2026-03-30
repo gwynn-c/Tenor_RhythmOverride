@@ -3,17 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class Interactable : MonoBehaviour, IInteractable
 {
-    
+    public string interactText;
     public void Interact(Transform interactor)
     {
         //Load Next Level
-        // SceneManager.LoadScene();
-        Debug.Log("Interacted with " + interactor.name);
+        SceneManager.LoadScene("Scenes/Playground");
     }
 
     public string GetInteractableName()
     {
-        return gameObject.name;
+        return interactText;
     }
 
     public Transform GetInteractableTransform()

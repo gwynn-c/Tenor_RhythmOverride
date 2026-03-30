@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba54f0a01924407b825c581868351376, type: 3}
+  m_Name: Shotgun
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponSO
+  _name: Shotgun
+  _description: KABOOOOOM!
+  _icon: {fileID: 21300000, guid: b5969fbdd7ac43f4586b6f55e4bc0210, type: 3}
+  bulletPrefab: {fileID: 7329040411629406293, guid: 133510c3751d5f14384e23d866114c75, type: 3}
+  muzzleVFXPrefab: {fileID: 6980259576133684760, guid: 1f58a1dea6bbd9347843e4935585e6a2, type: 3}
+  shootForce: 70
+  upwardForce: 30
+  timeBetweenShots: 0.9
+  spread: 5
+  timebetweenShooting: 0.1
+  bulletsPerShot: 6

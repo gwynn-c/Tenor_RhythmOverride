@@ -7,16 +7,18 @@ public class Conductor : MonoBehaviour
 {
     public static Conductor Instance {get; private set;}
     public AudioSource audioSource;
-    
+    public SongData[] songs;
+    private int songIndex;
+    public AudioSource secondaryAudioSource;
     [Header("Song Settings")]
+    [Space(10)]
+
     public float beatsPerMinute;
     public float secondsPerBeat;
     public float songPositionInBeats;
     public float dspSongTime;
     public float songPosition;
 
-    public float inputTime;
-    public float InputStep = 1;
     // [Header("Loop Settings")]
     // [Space(10)]
     // //If Looping Audio
@@ -24,7 +26,8 @@ public class Conductor : MonoBehaviour
     // public float beatsPerLoop;
     // public int completedLoops;
     // public float loopPositionInBeats;
-
+    public AudioClip positveFeedback;
+    public AudioClip negativeFeedback;
     [Header("Streak Settings")]
     [Space(10)]
     public int currentStreak;
@@ -44,17 +47,19 @@ public class Conductor : MonoBehaviour
     
     public void Awake()
     {
+        songIndex = 0;
         if(Instance == null)
             Instance = this;
-        
+        beatsPerMinute = songs[songIndex].beatsPerMinute;
+        audioSource.clip = songs[songIndex].song;
     }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        
         secondsPerBeat = 60f/beatsPerMinute;
         dspSongTime = (float)AudioSettings.dspTime;
-        audioSource.Play();
         
         
         var crosshair = GetComponent<MMF_Player>();
@@ -70,14 +75,28 @@ public class Conductor : MonoBehaviour
     void IncrementScore()
     {
         currentStreak++;
+        PlayFeedback(positveFeedback);
     }
 
     void ResetStreak()
     {
+        if(currentStreak >= 5)
+        {
+            PlayFeedback(negativeFeedback);
+        }
         currentStreak = 0;
     }
+
+    private void PlayFeedback(AudioClip audioClip)
+    {
+        if (secondaryAudioSource.isPlaying) return;
+        secondaryAudioSource.clip = audioClip;
+        secondaryAudioSource.Play();
+    }
+
     void Update()
     {
+        if(!audioSource.isPlaying) return;
         songPosition = (float)(AudioSettings.dspTime - dspSongTime);
         
         songPositionInBeats = songPosition / secondsPerBeat;
@@ -93,6 +112,45 @@ public class Conductor : MonoBehaviour
     {
         return audioSource.clip.length;
     }
-    
-    
+
+    public void NextSong()
+    {
+        if (songIndex >= songs.Length - 1)
+            songIndex = 0 ;  
+        else
+            songIndex++;
+
+        audioSource.clip = songs[songIndex].song;   
+        beatsPerMinute = songs[songIndex].beatsPerMinute;
+        PlaySong();
+
+    }
+    public void PreviousSong()
+    {
+        if (songIndex <= 0)
+            songIndex = songIndex - 1;
+        else 
+            songIndex--;
+        audioSource.clip = songs[songIndex].song;   
+        beatsPerMinute = songs[songIndex].beatsPerMinute;
+        
+        PlaySong();
+    }
+
+    public void PauseSong()
+    {
+        audioSource.Pause();
+    }
+
+    public void PlaySong()
+    {
+        audioSource.Play();
+        songPositionInBeats = 0;
+        songPosition = 0;
+    }
+    public void StopSong()
+    {
+        audioSource.Pause();
+        audioSource.time = 0;
+    }
 }

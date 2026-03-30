@@ -69,6 +69,7 @@ GameObject:
   - component: {fileID: 2727923111717502889}
   - component: {fileID: 1298643481405128339}
   - component: {fileID: 6818668322289306513}
+  - component: {fileID: 2271699293660971746}
   m_Layer: 0
   m_Name: Conductor
   m_TagString: Conductor
@@ -104,17 +105,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Conductor
   audioSource: {fileID: 3306555721529558413}
-  beatsPerMinute: 90
+  secondaryAudioSource: {fileID: 2271699293660971746}
+  beatsPerMinute: 120
   secondsPerBeat: 0
   songPositionInBeats: 0
   dspSongTime: 0
   songPosition: 0
-  inputTime: 0
-  InputStep: 2
-  firstBeatOffset: 0
-  beatsPerLoop: 0
-  completedLoops: 0
-  loopPositionInBeats: 0
+  positveFeedback: {fileID: 8300000, guid: 78419f98379502c4dbfb2774bc94e7c1, type: 3}
+  negativeFeedback: {fileID: 8300000, guid: a245ee5d75348c84a89ffb7992f1dc82, type: 3}
   currentStreak: 0
   streakText: {fileID: 0}
 --- !u!114 &6818668322289306513
@@ -307,8 +305,8 @@ MonoBehaviour:
         Mode: 0
         AnimateScaleTarget: {fileID: 0}
         AnimateScaleDuration: 0.2
-        RemapCurveZero: 1
-        RemapCurveOne: 1.4
+        RemapCurveZero: 1.4
+        RemapCurveOne: 1
         Offset: 0
         AnimateX: 1
         AnimateScaleTweenX:
@@ -565,10 +563,107 @@ MonoBehaviour:
           ConditionPropertyName: 
           EnumConditionPropertyName: Mode
           EnumConditions: 0100010000000000000000000000000000000000000000000000000000000000
-        CurveRemapZero: 0
-        CurveRemapOne: 1
+        CurveRemapZero: 1
+        CurveRemapOne: 0
         DestinationAlpha: 1
         DisableOnStop: 0
+--- !u!82 &2271699293660971746
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2970533211790180080}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.4
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5702487506343633769
 GameObject:
   m_ObjectHideFlags: 0
@@ -647,11 +742,11 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 1ecff7c18707f4545a43313704f4447e, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

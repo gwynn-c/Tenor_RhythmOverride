@@ -22,7 +22,7 @@ public class UIHandler : MonoBehaviour
         
         
         Force.SetText("Force: " + weaponInfo.shootForce.ToString());
-        Speed.SetText("Speed: " + weaponInfo.upwardForce.ToString());
+        Speed.SetText("Recoil " + weaponInfo.upwardForce.ToString());
         Damage.SetText("Damage: " + weaponInfo.bulletPrefab.GetComponent<BulletController>().damage.ToString());
 
     }

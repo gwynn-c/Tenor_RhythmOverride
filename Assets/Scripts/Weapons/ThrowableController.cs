@@ -19,7 +19,8 @@ public class ThrowableController : MonoBehaviour
     private bool isReadyToThrow, isThrowing;
     private bool allowInvoke;
     
-
+    public AudioSource audioSource;
+    [SerializeReference] private AudioClip throwSound;
 
     private void Awake()
     {
@@ -64,7 +65,7 @@ public class ThrowableController : MonoBehaviour
         _uiController.ThrowableCooldownFill.fillAmount = 0;
         var targetPosition = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
 
-      
+        PlayAudio(throwSound);
         var directionWithoutSpread = targetPosition - throwableTransform.position;
 
         
@@ -91,6 +92,11 @@ public class ThrowableController : MonoBehaviour
         _input.specialAttack= false;
         yield return new WaitUntil(() => isReadyToThrow);
     }
-
+    void PlayAudio(AudioClip clip)
+    {
+        if (audioSource.isPlaying) return;
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
 }
 

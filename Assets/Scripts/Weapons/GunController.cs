@@ -7,7 +7,7 @@ public class GunController : MonoBehaviour
     private Camera _mainCamera;
     private Conductor _conductor;
     private StarterAssetsInputs _input;
-
+    private Animator _animator;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private GameObject secondaryPrefab;
     
@@ -26,9 +26,13 @@ public class GunController : MonoBehaviour
 
     private bool isShooting, isReadyToShoot;
     public bool allowInvoke;
-
-
-    public GameObject MuzzleFlashVFX;
+    
+    AudioSource audioSource;
+    [SerializeField] AudioClip shootingAudio;
+    [SerializeField] AudioClip secondaryShootingAudio;
+    
+    public ParticleSystem MuzzleFlashVFX;
+    private int bulletShot, bulletsLeft;
 
     // public AudioClip shootSFX;
     private void Awake()
@@ -38,6 +42,7 @@ public class GunController : MonoBehaviour
             _input = GetComponentInParent<StarterAssetsInputs>();
 
         }
+        audioSource = GetComponent<AudioSource>();
     }
     private IEnumerator Start()
     {
@@ -62,6 +67,8 @@ public class GunController : MonoBehaviour
         isReadyToShoot = true;
         beatInput = _conductor.secondsPerBeat;
         _input = input;
+        MuzzleFlashVFX = GetComponentInChildren<ParticleSystem>();
+        _animator = GetComponent<Animator>();
     }
     private void InputHandler()
     {
@@ -100,43 +107,67 @@ public class GunController : MonoBehaviour
     private void Shoot()
     {
         isReadyToShoot = false;
+        _animator.CrossFade("Shooting", .1f);
         if(IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
         else EventManager.instance.playerEvents.OnBeatInputMissed();
-        if(MuzzleFlashVFX != null)
-            Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
+        MuzzleFlashVFX.Play();
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
-        
+        bulletShot++;
+        bulletsLeft--;
+
+        PlayShootAudio(shootingAudio);
         var targetPosition = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
+        if (bulletPerShot >= 1)
+        {
+            for (int i = 0; i < bulletPerShot; i++)
+            {
+                var x = Random.Range(-spread, spread);
 
-        var x = Random.Range(-spread, spread);
-        var y = Random.Range(-spread, spread);
-        
-        var directionWithoutSpread = targetPosition - barrelTransform.position;
-        
-        Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
-        
-        var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
-        spawnedPrefab.transform.forward = directionWithSpread.normalized;
-        
-        spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+                var y = Random.Range(-spread, spread);
 
+                var directionWithoutSpread = targetPosition - barrelTransform.position;
+
+                Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
+
+                var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
+                spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+
+            }
+        }
+        else
+        {
+            var x = Random.Range(-spread, spread);
+
+            var y = Random.Range(-spread, spread);
+
+            var directionWithoutSpread = targetPosition - barrelTransform.position;
+        
+            Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
+        
+            var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
+            spawnedPrefab.transform.forward = directionWithSpread.normalized;
+        
+            spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+        }
+        
         
         if (allowInvoke)
         {
             Invoke("ResetShot", timeBetweenShots);
             allowInvoke = false;
         }
-        
     }
     private void ShootSecondary()
     {
         isReadyToShoot = false;
-        if(MuzzleFlashVFX != null)
-            Instantiate(MuzzleFlashVFX, barrelTransform.position, Quaternion.identity);
+        MuzzleFlashVFX.Play();
+        _animator.CrossFade("Secondary", .1f);
+
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
-        
+        PlayShootAudio(secondaryShootingAudio);
+
         var targetPosition = Physics.Raycast(ray, out hit) ? hit.point : ray.GetPoint(75);
 
         var x = Random.Range(-spread, spread);
@@ -158,7 +189,6 @@ public class GunController : MonoBehaviour
             Invoke("ResetShot", timeBetweenShots);
             allowInvoke = false;
         }
-        
     }
     
     private void ResetShot()
@@ -169,5 +199,11 @@ public class GunController : MonoBehaviour
         _input.secondaryAttack= false;
         beatInput = 0;
     }
-
+    void PlayShootAudio(AudioClip clip)
+    {
+        if (audioSource.isPlaying) return;
+        audioSource.clip = clip;
+        audioSource.Play();
+    }
 }
+

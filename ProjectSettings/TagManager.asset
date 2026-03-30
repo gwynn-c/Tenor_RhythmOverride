@@ -9,6 +9,7 @@ TagManager:
   - Conductor
   - Trap
   - World Space UI
+  - Bullet
   layers:
   - Default
   - TransparentFX

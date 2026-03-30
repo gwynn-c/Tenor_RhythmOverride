@@ -5,6 +5,7 @@ public class PlayerEvents
     public event Action OnBeatInput;
 
     public event Action OnBeatMissed;
+    public event Action EnemyKilled;
 
     public void OnBeatInputPressed()
     {
@@ -13,5 +14,10 @@ public class PlayerEvents
     public void OnBeatInputMissed()
     {
         OnBeatMissed?.Invoke();
+    }
+
+    public void OnEnemyKilled()
+    {
+        EnemyKilled?.Invoke();
     }
 }

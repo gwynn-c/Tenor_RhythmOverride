@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -220,19 +221,28 @@ namespace StarterAssets
 				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
 			}
 
-			if (_input.dash && canDash)
+			if (canDash && _input.dash)
 			{
-				canDash = false;
-				_controller.Move(inputDirection.normalized * (dashSpeed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-				_input.dash = false;
-				uiController.DashCooldownFill.fillAmount = 0;
-
-				StartCoroutine(ResetDash());
+					StartCoroutine(Dash());
 			}
 			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
-		
+
+		private IEnumerator Dash()
+		{
+			canDash = false;
+			_input.dash = true;
+			uiController.DashCooldownFill.fillAmount = 0;
+			var tempCD = 0f;
+			while (tempCD <= dashDuration)
+			{
+				tempCD += Time.deltaTime;
+				_controller.Move(transform.forward * (dashSpeed * dashDuration) + new Vector3(0.0f, _verticalVelocity, 0.0f) * dashDuration);
+				yield return null;
+			}
+			StartCoroutine(ResetDash());
+		}
 		private IEnumerator ResetDash()
 		{
 			var tempCD = 0f;
@@ -243,6 +253,8 @@ namespace StarterAssets
 				yield return null;
 			}
 			canDash = true;
+			_input.dash = false;
+
 			yield return new WaitUntil(() => canDash);
 			
 		}
@@ -277,12 +289,13 @@ namespace StarterAssets
 			}
 			else if(!Grounded && canDoubleJump)
 			{
+				
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					_playerController.PlayJumpAudio(jumpSFXClip, transform.position, 1f);
 
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
-					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity) * 2;
+					_verticalVelocity = Mathf.Sqrt(JumpHeight/2 * -2f * Gravity) * 2;
 					canDoubleJump = false;
 				}
 			}
@@ -315,6 +328,7 @@ namespace StarterAssets
 
 		public float slamSpeed;
 		public AudioClip[] jumpSFXClip;
+		[SerializeField] private float dashDuration = 2f;
 
 		private void GroundSlam()
 		{ 

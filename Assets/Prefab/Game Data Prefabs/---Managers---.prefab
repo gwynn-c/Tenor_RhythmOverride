@@ -105,6 +105,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Conductor
   audioSource: {fileID: 3306555721529558413}
+  songs:
+  - {fileID: 11400000, guid: 6a963560141d7df43bb38c9d9cc0a010, type: 2}
+  - {fileID: 11400000, guid: 9b5622e8f89a1e74bac4753a9291025a, type: 2}
+  - {fileID: 11400000, guid: 042a6da0824b11b45a039aa72fef6ebe, type: 2}
+  - {fileID: 11400000, guid: 769437acb670da94daa3812b3749e75f, type: 2}
   secondaryAudioSource: {fileID: 2271699293660971746}
   beatsPerMinute: 120
   secondsPerBeat: 0
@@ -533,7 +538,7 @@ MonoBehaviour:
         AllowAdditivePlays: 0
         InstantAlpha: 1
         Curve:
-          MMTweenDefinitionType: 0
+          MMTweenDefinitionType: 1
           MMTweenCurve: 0
           Curve:
             serializedVersion: 2
@@ -541,18 +546,18 @@ MonoBehaviour:
             - serializedVersion: 3
               time: 0
               value: 0
-              inSlope: 0
-              outSlope: 0
-              tangentMode: 0
+              inSlope: 1
+              outSlope: 1
+              tangentMode: 34
               weightedMode: 0
               inWeight: 0
               outWeight: 0
             - serializedVersion: 3
               time: 1
               value: 1
-              inSlope: 0
-              outSlope: 0
-              tangentMode: 0
+              inSlope: 1
+              outSlope: 1
+              tangentMode: 34
               weightedMode: 0
               inWeight: 0
               outWeight: 0
@@ -563,8 +568,8 @@ MonoBehaviour:
           ConditionPropertyName: 
           EnumConditionPropertyName: Mode
           EnumConditions: 0100010000000000000000000000000000000000000000000000000000000000
-        CurveRemapZero: 1
-        CurveRemapOne: 0
+        CurveRemapZero: 0
+        CurveRemapOne: 1
         DestinationAlpha: 1
         DisableOnStop: 0
 --- !u!82 &2271699293660971746
@@ -580,7 +585,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.4
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -744,7 +749,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 1ecff7c18707f4545a43313704f4447e, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0

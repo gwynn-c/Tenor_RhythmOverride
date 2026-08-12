@@ -1,8 +1,9 @@
 using System;
 using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BulletController : MonoBehaviour
+public class BulletController : NetworkBehaviour
 {
     private Rigidbody rb;
 
@@ -10,11 +11,11 @@ public class BulletController : MonoBehaviour
 
     public float damage;
     [SerializeField] private float maxLifeTime = 3f;
-    
+
     public bool isBullet;
-    [Header("Bounce Settings")] 
+    [Header("Bounce Settings")]
     public bool useGravity, explodeOnCollision;
-    [Range(0,1)]public float _bounciness;
+    [Range(0, 1)] public float _bounciness;
     [SerializeField] private float maxBounces, currentBounces;
     [SerializeField] private AudioClip bounceSound;
     [SerializeField] private float explosionRadius, explosionForce;
@@ -23,12 +24,12 @@ public class BulletController : MonoBehaviour
     [SerializeField] private GameObject hitImpact;
     private PhysicsMaterial _bounceMaterial;
 
-  
+
     private void Start()
     {
         Setup();
     }
-    
+
     private void Setup()
     {
         rb = GetComponent<Rigidbody>();
@@ -47,16 +48,16 @@ public class BulletController : MonoBehaviour
 
     private void Update()
     {
-        maxLifeTime -= Time.fixedDeltaTime;  
+        maxLifeTime -= Time.fixedDeltaTime;
         if (!isBullet)
         {
-            if(currentBounces > maxBounces) Explode();
-        
-            if(maxLifeTime <= 0) Explode();
+            if (currentBounces > maxBounces) Explode();
+
+            if (maxLifeTime <= 0) Explode();
         }
         else
         {
-            if(maxLifeTime <= 0) BulletImpact();
+            if (maxLifeTime <= 0) BulletImpact();
         }
     }
 
@@ -66,7 +67,7 @@ public class BulletController : MonoBehaviour
 
         if (explosionGameObject != null && spawnedGO == null)
         {
-             spawnedGO = Instantiate(explosionGameObject, transform.position, Quaternion.identity);
+            spawnedGO = Instantiate(explosionGameObject, transform.position, Quaternion.identity);
         }
         Collider[] enemies = Physics.OverlapSphere(transform.position, explosionRadius, enemiesLayerMask);
         foreach (var e in enemies)
@@ -77,15 +78,21 @@ public class BulletController : MonoBehaviour
                 var eRb = e.GetComponent<Rigidbody>();
                 eRb.AddExplosionForce(explosionForce, transform.position, explosionRadius);
             }
-            
+
         }
-        
+
         Destroy(gameObject, 0.05f);
     }
 
     private void BulletImpact()
     {
-        Destroy(gameObject,0.05f);
+        // Destroy(gameObject, 0.05f);
+        DestroyRpc();
+    }
+    [Rpc(SendTo.Server)]
+    private void DestroyRpc()
+    {
+        NetworkObject.Despawn(true);
     }
     private void OnCollisionEnter(Collision other)
     {
@@ -93,9 +100,9 @@ public class BulletController : MonoBehaviour
         {
             if (other.collider.CompareTag("Enemy"))
             {
-                if(hitImpact != null) Instantiate(hitImpact, other.contacts[0].point, Quaternion.identity);
-                if(other.collider.TryGetComponent<EnemyController>(out EnemyController e) )
-                   e.TakeDamage(damage);
+                if (hitImpact != null) Instantiate(hitImpact, other.contacts[0].point, Quaternion.identity);
+                if (other.collider.TryGetComponent<EnemyController>(out EnemyController e))
+                    e.TakeDamage(damage);
             }
             Destroy(gameObject);
         }
@@ -103,12 +110,12 @@ public class BulletController : MonoBehaviour
         {
             currentBounces++;
             // Instantiate(explosionGameObject, transform.position, Quaternion.identity);
-            if(other.collider.CompareTag("Enemy") && explodeOnCollision)
+            if (other.collider.CompareTag("Enemy") && explodeOnCollision)
             {
-                if(other.collider.TryGetComponent<EnemyController>(out EnemyController e) )
+                if (other.collider.TryGetComponent<EnemyController>(out EnemyController e))
                     e.TakeDamage(damage);
             }
-            Explode();  
+            Explode();
         }
     }
 

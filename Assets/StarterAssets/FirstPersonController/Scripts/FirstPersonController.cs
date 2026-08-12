@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -22,7 +21,7 @@ namespace StarterAssets
 		public float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
-		
+
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
@@ -77,7 +76,7 @@ namespace StarterAssets
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
 
-		
+
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -85,21 +84,20 @@ namespace StarterAssets
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
 		private PlayerController _playerController;
-		private PlayerUIController uiController;
+		// private PlayerUIController uiController;
 		private const float _threshold = 0.01f;
 
 		private bool IsCurrentDeviceMouse
 		{
 			get
 			{
-				#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
 				return _playerInput.currentControlScheme == "KeyboardMouse";
-				#else
+#else
 				return false;
-				#endif
+#endif
 			}
 		}
-
 		private void Awake()
 		{
 			// get a reference to our main camera
@@ -107,20 +105,19 @@ namespace StarterAssets
 			{
 				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
+			// reset our timeouts on start
+
 		}
+
 
 		private void Start()
 		{
 			_controller = GetComponent<CharacterController>();
 			_input = GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM
 			_playerInput = GetComponent<PlayerInput>();
-#else
-			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
-#endif
 			_playerController = GetComponent<PlayerController>();
-			uiController = GetComponent<PlayerUIController>();
-			// reset our timeouts on start
+			// uiController = GetComponent<PlayerUIController>();
+
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
 			canGroundSlam = true;
@@ -131,8 +128,8 @@ namespace StarterAssets
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
-			
-			
+
+
 		}
 
 		private void LateUpdate()
@@ -147,8 +144,8 @@ namespace StarterAssets
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
 		}
 
-		
-		
+
+
 		private void CameraRotation()
 		{
 			// if there is an input
@@ -156,7 +153,7 @@ namespace StarterAssets
 			{
 				//Don't multiply mouse input by Time.deltaTime
 				float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
-				
+
 				_cinemachineTargetPitch += _input.look.y * RotationSpeed * deltaTimeMultiplier;
 				_rotationVelocity = _input.look.x * RotationSpeed * deltaTimeMultiplier;
 
@@ -173,7 +170,7 @@ namespace StarterAssets
 
 		private void Move()
 		{
-			
+
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
@@ -195,7 +192,7 @@ namespace StarterAssets
 				// creates curved result rather than a linear one giving a more organic speed change
 				// note T in Lerp is clamped, so we don't need to clamp our speed
 				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-				
+
 				// round speed to 3 decimal places
 				_speed = Mathf.Round(_speed * 1000f) / 1000f;
 			}
@@ -214,50 +211,50 @@ namespace StarterAssets
 				// move
 				if (Grounded)
 				{
-					if(_input.sprint ) 
+					if (_input.sprint)
 						_playerController.PlayRunAudio();
 					_playerController.PlayWalkAudio();
 				}
 				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
 			}
 
-			if (canDash && _input.dash)
-			{
-					StartCoroutine(Dash());
-			}
+			// if (canDash && _input.dash)
+			// {
+			// 	StartCoroutine(Dash());
+			// }
 			// move the player
 			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 		}
 
-		private IEnumerator Dash()
-		{
-			canDash = false;
-			_input.dash = true;
-			uiController.DashCooldownFill.fillAmount = 0;
-			var tempCD = 0f;
-			while (tempCD <= dashDuration)
-			{
-				tempCD += Time.deltaTime;
-				_controller.Move(transform.forward * (dashSpeed * dashDuration) + new Vector3(0.0f, _verticalVelocity, 0.0f) * dashDuration);
-				yield return null;
-			}
-			StartCoroutine(ResetDash());
-		}
-		private IEnumerator ResetDash()
-		{
-			var tempCD = 0f;
-			while (tempCD <= dashCooldown)
-			{
-				tempCD += Time.deltaTime;
-				uiController.DashCooldownFill.fillAmount = tempCD/dashCooldown;
-				yield return null;
-			}
-			canDash = true;
-			_input.dash = false;
+		// private IEnumerator Dash()
+		// {
+		// 	canDash = false;
+		// 	_input.dash = true;
+		// 	// uiController.DashCooldownFill.fillAmount = 0;
+		// 	var tempCD = 0f;
+		// 	while (tempCD <= dashDuration)
+		// 	{
+		// 		tempCD += Time.deltaTime;
+		// 		_controller.Move(transform.forward * (dashSpeed * dashDuration) + new Vector3(0.0f, _verticalVelocity, 0.0f) * dashDuration);
+		// 		yield return null;
+		// 	}
+		// 	StartCoroutine(ResetDash());
+		// }
+		// private IEnumerator ResetDash()
+		// {
+		// 	var tempCD = 0f;
+		// 	while (tempCD <= dashCooldown)
+		// 	{
+		// 		tempCD += Time.deltaTime;
+		// 		uiController.DashCooldownFill.fillAmount = tempCD / dashCooldown;
+		// 		yield return null;
+		// 	}
+		// 	canDash = true;
+		// 	_input.dash = false;
 
-			yield return new WaitUntil(() => canDash);
-			
-		}
+		// 	yield return new WaitUntil(() => canDash);
+
+		// }
 		private void JumpAndGravity()
 		{
 			if (Grounded)
@@ -287,15 +284,15 @@ namespace StarterAssets
 					_jumpTimeoutDelta -= Time.deltaTime;
 				}
 			}
-			else if(!Grounded && canDoubleJump)
+			else if (!Grounded && canDoubleJump)
 			{
-				
+
 				if (_input.jump && _jumpTimeoutDelta <= 0.0f)
 				{
 					_playerController.PlayJumpAudio(jumpSFXClip, transform.position, 1f);
 
 					// the square root of H * -2 * G = how much velocity needed to reach desired height
-					_verticalVelocity = Mathf.Sqrt(JumpHeight/2 * -2f * Gravity) * 2;
+					_verticalVelocity = Mathf.Sqrt(JumpHeight / 2 * -2f * Gravity) * 2;
 					canDoubleJump = false;
 				}
 			}
@@ -311,18 +308,19 @@ namespace StarterAssets
 				}
 
 				// if we are not grounded, do not jump
-					_input.jump = false;
-			}
-			if (_input.crouch && !Grounded && canGroundSlam)
-			{
-				GroundSlam();
-				canGroundSlam = false;
-				StartCoroutine(nameof(GroundSlamUI));
-			}
-			// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-			if (_verticalVelocity < _terminalVelocity)
-			{
-				_verticalVelocity += Gravity * Time.deltaTime;
+				_input.jump = false;
+				// }
+				// if (_input.crouch && !Grounded && canGroundSlam)
+				// {
+				// 	GroundSlam();
+				// 	canGroundSlam = false;
+				// 	StartCoroutine(nameof(GroundSlamUI));
+				// }
+				// apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
+				if (_verticalVelocity < _terminalVelocity)
+				{
+					_verticalVelocity += Gravity * Time.deltaTime;
+				}
 			}
 		}
 
@@ -330,41 +328,41 @@ namespace StarterAssets
 		public AudioClip[] jumpSFXClip;
 		[SerializeField] private float dashDuration = 2f;
 
-		private void GroundSlam()
-		{ 
-			_verticalVelocity -= slamSpeed * Time.deltaTime;
-			uiController.SlamCooldownFill.fillAmount = 0;
+		// private void GroundSlam()
+		// {
+		// 	_verticalVelocity -= slamSpeed * Time.deltaTime;
+		// 	uiController.SlamCooldownFill.fillAmount = 0;
 
-			StartCoroutine(Slam());
-		}
+		// 	StartCoroutine(Slam());
+		// }
 
-		private IEnumerator Slam()
-		{
-			yield return new WaitUntil(() => Grounded);
-			_playerController.GroundSlam(GroundedOffset);
-		}
-		
+		// private IEnumerator Slam()
+		// {
+		// 	yield return new WaitUntil(() => Grounded);
+		// 	_playerController.GroundSlam(GroundedOffset);
+		// }
 
-		IEnumerator GroundSlamUI()
-		{
-			var tempCD = 0f;
-			while (tempCD <= groundSlamCooldown)
-			{
-				tempCD += Time.fixedDeltaTime;
-				uiController.SlamCooldownFill.fillAmount = tempCD / groundSlamCooldown;
-				yield return null;
-			}
-			canGroundSlam = true;
-			yield return new WaitUntil(() => canGroundSlam);
-		}
+
+		// IEnumerator GroundSlamUI()
+		// {
+		// 	var tempCD = 0f;
+		// 	while (tempCD <= groundSlamCooldown)
+		// 	{
+		// 		tempCD += Time.fixedDeltaTime;
+		// 		uiController.SlamCooldownFill.fillAmount = tempCD / groundSlamCooldown;
+		// 		yield return null;
+		// 	}
+		// 	canGroundSlam = true;
+		// 	yield return new WaitUntil(() => canGroundSlam);
+		// }
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 		{
 			if (lfAngle < -360f) lfAngle += 360f;
 			if (lfAngle > 360f) lfAngle -= 360f;
 			return Mathf.Clamp(lfAngle, lfMin, lfMax);
 		}
-		
-		
+
+
 		private void OnDrawGizmosSelected()
 		{
 			Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);

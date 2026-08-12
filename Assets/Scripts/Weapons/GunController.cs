@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using StarterAssets;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GunController : MonoBehaviour
+public class GunController : NetworkBehaviour
 {
     private Camera _mainCamera;
     private Conductor _conductor;
@@ -10,11 +11,11 @@ public class GunController : MonoBehaviour
     private Animator _animator;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private GameObject secondaryPrefab;
-    
+
     [SerializeField] private Transform barrelTransform;
 
     private float beatInput;
-    [Range(0.1f, .3f)] [SerializeField] private float inputDelay = .15f;
+    [Range(0.1f, .3f)][SerializeField] private float inputDelay = .15f;
     public bool IsOnBeat { get; private set; }
 
     [SerializeField] private float shootForce, upwardForce;
@@ -26,11 +27,11 @@ public class GunController : MonoBehaviour
 
     private bool isShooting, isReadyToShoot;
     public bool allowInvoke;
-    
+
     AudioSource audioSource;
     [SerializeField] AudioClip shootingAudio;
     [SerializeField] AudioClip secondaryShootingAudio;
-    
+
     public ParticleSystem MuzzleFlashVFX;
     private int bulletShot, bulletsLeft;
 
@@ -51,12 +52,12 @@ public class GunController : MonoBehaviour
 
         yield return new WaitUntil(() => _input != null);
     }
-    
-    
+
+
     private void Update()
     {
         if (_input == null) return;
-        
+
         beatInput += Time.deltaTime;
         InputHandler();
     }
@@ -65,22 +66,22 @@ public class GunController : MonoBehaviour
     {
         _mainCamera = Camera.main;
         isReadyToShoot = true;
-        beatInput = _conductor.secondsPerBeat;
+        // beatInput = _conductor.secondsPerBeat;
         _input = input;
         MuzzleFlashVFX = GetComponentInChildren<ParticleSystem>();
         _animator = GetComponent<Animator>();
     }
-    private void InputHandler()
+    public void InputHandler()
     {
         if (_input.attack)
         {
             isShooting = _input.attack;
-            
+
             if (isShooting && isReadyToShoot)
             {
-                if (beatInput >= _conductor.secondsPerBeat - inputDelay  && beatInput <= _conductor.secondsPerBeat + inputDelay)
+                if (beatInput >= _conductor.secondsPerBeat - inputDelay && beatInput <= _conductor.secondsPerBeat + inputDelay)
                 {
- 
+
                     IsOnBeat = true;
                 }
                 else
@@ -92,25 +93,25 @@ public class GunController : MonoBehaviour
             }
         }
 
-        if (_input.secondaryAttack  && _conductor.currentStreak >= 3)
+        if (_input.secondaryAttack && _conductor.currentStreak >= 3)
         {
             isShooting = _input.secondaryAttack;
             if (isShooting && isReadyToShoot)
-            {            
+            {
                 _conductor.currentStreak -= 3;
                 ShootSecondary();
             }
         }
     }
 
-    
     private void Shoot()
     {
         isReadyToShoot = false;
         _animator.CrossFade("Shooting", .1f);
-        if(IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
+        if (IsOnBeat) EventManager.instance.playerEvents.OnBeatInputPressed();
         else EventManager.instance.playerEvents.OnBeatInputMissed();
-        MuzzleFlashVFX.Play();
+        if (MuzzleFlashVFX != null)
+            MuzzleFlashVFX.Play();
         Ray ray = _mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
         bulletShot++;
@@ -129,12 +130,20 @@ public class GunController : MonoBehaviour
                 var directionWithoutSpread = targetPosition - barrelTransform.position;
 
                 Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
-
-                var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
-                spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+                if (IsServer)
+                {
+                    var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
+                    spawnedPrefab.GetComponent<NetworkObject>().Spawn();
+                    spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+                }
+                else
+                {
+                    ShootServerRpc(directionWithSpread);
+                }
 
             }
         }
+
         else
         {
             var x = Random.Range(-spread, spread);
@@ -142,21 +151,36 @@ public class GunController : MonoBehaviour
             var y = Random.Range(-spread, spread);
 
             var directionWithoutSpread = targetPosition - barrelTransform.position;
-        
+
             Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
-        
-            var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
-            spawnedPrefab.transform.forward = directionWithSpread.normalized;
-        
-            spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+            if (IsServer)
+            {
+                var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
+                spawnedPrefab.GetComponent<NetworkObject>().Spawn();
+                spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+            }
+            else
+            {
+                ShootServerRpc(directionWithSpread);
+            }
+
         }
-        
-        
+
+
         if (allowInvoke)
         {
             Invoke("ResetShot", timeBetweenShots);
             allowInvoke = false;
         }
+    }
+    [Rpc(SendTo.Server)]
+    private void ShootServerRpc(Vector3 directionWithSpread)
+    {
+        var spawnedPrefab = Instantiate(bulletPrefab, barrelTransform.position, Quaternion.identity);
+        spawnedPrefab.GetComponent<NetworkObject>().Spawn();
+
+        spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * shootForce, ForceMode.Impulse);
+
     }
     private void ShootSecondary()
     {
@@ -172,31 +196,31 @@ public class GunController : MonoBehaviour
 
         var x = Random.Range(-spread, spread);
         var y = Random.Range(-spread, spread);
-        
+
         var directionWithoutSpread = targetPosition - barrelTransform.position;
-        
+
         Vector3 directionWithSpread = directionWithoutSpread + new Vector3(x, y, 0);
-        
+
         var spawnedPrefab = Instantiate(secondaryPrefab, barrelTransform.position, Quaternion.identity);
         spawnedPrefab.transform.forward = directionWithSpread.normalized;
-        
+
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(directionWithSpread.normalized * secondaryForce, ForceMode.Impulse);
         spawnedPrefab.GetComponentInChildren<Rigidbody>().AddForce(_mainCamera.transform.up * upwardForce, ForceMode.Impulse);
 
-        
+
         if (allowInvoke)
         {
             Invoke("ResetShot", timeBetweenShots);
             allowInvoke = false;
         }
     }
-    
+
     private void ResetShot()
     {
         isReadyToShoot = true;
         allowInvoke = true;
         _input.attack = false;
-        _input.secondaryAttack= false;
+        _input.secondaryAttack = false;
         beatInput = 0;
     }
     void PlayShootAudio(AudioClip clip)

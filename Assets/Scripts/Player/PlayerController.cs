@@ -1,21 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using MoreMountains.Feedbacks;
-using MoreMountains.FeedbacksForThirdParty;
 using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-
-public class PlayerController : MonoBehaviour
+using Unity.Netcode;
+using Unity.Cinemachine;
+public class PlayerController : NetworkBehaviour
 {
     //Components
     Conductor _conductor;
     private MMF_Player _player;
+
     private StarterAssetsInputs _input;
     //Gun References
+    [SerializeField] private GameObject pfUICanvasControls;
     [SerializeField] private GameObject equippedGun;
+    [SerializeField] private CinemachineCamera cinemachineCamera;
+
+
     public bool isGunEquipped;
     public Transform GunSlot;
     public GameObject GroundSlamVFX;
@@ -24,56 +25,75 @@ public class PlayerController : MonoBehaviour
     public AudioClip[] footstepClips;
 
     public AudioClip[] runFootStepClips;
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        if(Cursor.lockState == CursorLockMode.None) Cursor.lockState = CursorLockMode.Locked;
-        Interacting = false;
-        _conductor = Conductor.Instance;
+
+        if (!IsOwner)
+        {
+            if (Cursor.lockState == CursorLockMode.None) Cursor.lockState = CursorLockMode.Locked;
+
+            GetComponent<PlayerInput>().enabled = false;
+            cinemachineCamera.gameObject.SetActive(false);
+
+            pfUICanvasControls.SetActive(false);
+
+        }
         _input = GetComponent<StarterAssetsInputs>();
         _player = GetComponent<MMF_Player>();
+        Interacting = false;
+        _conductor = Conductor.Instance;
     }
+    // [Rpc(SendTo.Server)]
+    // void InitializeGunRpc()
+    // {
+    //     var gun = Instantiate(equippedGun, GunSlot);
+    //     if (!IsServer)
+    //         equippedGun.GetComponent<NetworkObject>().Spawn();
+    //     SetEquippedGun(gun);
 
+
+    // }
     private void Update()
     {
         GetComponent<PlayerInput>().enabled = !Interacting;
-        isGunEquipped = equippedGun != null;
+        isGunEquipped = equippedGun is not null;
     }
 
     public bool Interacting;
 
     // Update is called once per frame
-    [SerializeReference] private GameObject spawnedGO;
-    public void GroundSlam(float offset)
-    {
-        //The Transform position of where the player's feet landed in relation to the player controller offset
-        var slamPosition = new Vector3(transform.position.x, transform.position.y - offset, transform.position.z);
-        //Colliders of all within the overlap sphere of the ground slam
-        var checkSphereSlammable = Physics.OverlapSphere(slamPosition, slamRadius);
-        //Check if an entity is within direct radius or further from the slam
-        foreach (var slammedEntity in checkSphereSlammable)
-        {
-            if (slammedEntity.TryGetComponent<Interactable_GroundSlam>(out var slammed))
-            {
-                if (_conductor.currentStreak >= 10)
-                {
-                    _conductor.currentStreak -= 10;
-                    slammed.Stun();
-                }
-                slammed.DirectSlam();
-            }
-            
-        }
+    // [SerializeReference] private GameObject spawnedGO;
+    // public void GroundSlam(float offset)
+    // {
+    //     //The Transform position of where the player's feet landed in relation to the player controller offset
+    //     var slamPosition = new Vector3(transform.position.x, transform.position.y - offset, transform.position.z);
+    //     //Colliders of all within the overlap sphere of the ground slam
+    //     var checkSphereSlammable = Physics.OverlapSphere(slamPosition, slamRadius);
+    //     //Check if an entity is within direct radius or further from the slam
+    //     foreach (var slammedEntity in checkSphereSlammable)
+    //     {
+    //         if (slammedEntity.TryGetComponent<Interactable_GroundSlam>(out var slammed))
+    //         {
+    //             if (_conductor.currentStreak >= 10)
+    //             {
+    //                 _conductor.currentStreak -= 10;
+    //                 slammed.Stun();
+    //             }
+    //             slammed.DirectSlam();
+    //         }
 
-        var cameraShake = _player.GetFeedbackOfType<MMF_CameraShake>();
-        cameraShake.CameraShakeProperties.Amplitude = 5;
-        cameraShake.CameraShakeProperties.Frequency = 100;
-        _player.PlayFeedbacks();
-        // SoundFXManager.instance.PlaySingleSoundFXClip();
-        if(spawnedGO == null)
-        {
-            spawnedGO = Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
-        }
-    }
+    //     }
+
+    //     var cameraShake = _player.GetFeedbackOfType<MMF_CameraShake>();
+    //     cameraShake.CameraShakeProperties.Amplitude = 5;
+    //     cameraShake.CameraShakeProperties.Frequency = 100;
+    //     _player.PlayFeedbacks();
+    //     // SoundFXManager.instance.PlaySingleSoundFXClip();
+    //     if (spawnedGO == null)
+    //     {
+    //         spawnedGO = Instantiate(GroundSlamVFX, slamPosition, Quaternion.identity);
+    //     }
+    // }
 
 
     public void SetEquippedGun(GameObject gunPrefab)
@@ -84,7 +104,6 @@ public class PlayerController : MonoBehaviour
             //Pop up for confirmation
         }
         equippedGun.GetComponent<GunController>().Initialize(_input);
-        equippedGun.transform.SetParent(GunSlot);
         equippedGun.transform.rotation = GunSlot.rotation;
         equippedGun.transform.position = GunSlot.position;
         equippedGun.transform.localScale = Vector3.one;
@@ -106,7 +125,7 @@ public class PlayerController : MonoBehaviour
         playerAudioSource.clip = runFootStepClips[UnityEngine.Random.Range(0, runFootStepClips.Length - 1)];
         playerAudioSource.Play();
     }
-    
+
     public void PlayJumpAudio(AudioClip[] jumpClips, Vector3 position, float volume)
     {
         if (playerAudioSource.isPlaying) return;

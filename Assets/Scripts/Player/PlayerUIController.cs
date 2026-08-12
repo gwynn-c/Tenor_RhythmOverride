@@ -14,38 +14,41 @@ public class PlayerUIController : MonoBehaviour
 
     public Image DashCooldownFill;
     public Image ThrowableCooldownFill;
-    public  Image SlamCooldownFill;
+    public Image SlamCooldownFill;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void OnEnable()
-    {
-        EventManager.instance.playerEvents.OnBeatInput += PlayFeedback;
+    // void OnEnable()
+    // {
+    //     EventManager.instance.playerEvents.OnBeatInput += PlayFeedback;
 
-    }
-    void OnDisable()
-    {
-        EventManager.instance.playerEvents.OnBeatInput -= PlayFeedback;
+    // }
+    // void OnDisable()
+    // {
+    //     EventManager.instance.playerEvents.OnBeatInput -= PlayFeedback;
 
-    }
-    private void PlayFeedback()
+    // }
+    // private void PlayFeedback()
+    // {
+    //     inputFeedbackContainer.SetActive(true);
+    // }
+
+    // // Update is called once per frame
+    private void Update()
     {
-        inputFeedbackContainer.SetActive(true);
+        // if(interactionController.GetInteractableObject() != null) {
+        //     Show(interactionController.GetInteractableObject());
+        // } else {
+        //     Hide();
+        // }
     }
 
-    // Update is called once per frame
-    private void Update(){
-        if(interactionController.GetInteractableObject() != null) {
-            Show(interactionController.GetInteractableObject());
-        } else {
-            Hide();
-        }
-    }
-    
-    private void Show(IInteractable interactable){
+    private void Show(IInteractable interactable)
+    {
         containerGameObject.SetActive(true);
         interactTextMeshProUGUI.text = interactable.GetInteractableName();
-    }   
-    private void Hide(){
+    }
+    private void Hide()
+    {
         containerGameObject.SetActive(false);
     }
 
@@ -61,5 +64,5 @@ public class PlayerUIController : MonoBehaviour
         weaponInfoGameObject.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
     }
-    
+
 }

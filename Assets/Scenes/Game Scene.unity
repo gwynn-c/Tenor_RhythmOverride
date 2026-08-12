@@ -377808,6 +377808,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Barrel_Mesh
       objectReference: {fileID: 0}
+    - target: {fileID: 3870818574379181189, guid: c02666205b5d9ec46b72042b8f40be46, type: 3}
+      propertyPath: m_Volume
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4799783896059102197, guid: c02666205b5d9ec46b72042b8f40be46, type: 3}
       propertyPath: weaponInfo
       value: 
